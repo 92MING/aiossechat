@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name="aiossechat",
-  version="0.0.1",
+  version="0.0.2",
   author="92MING",
   author_email="yashin.sd123@yahoo.com.hk",
   description="A small example package",

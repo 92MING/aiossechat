@@ -27,7 +27,7 @@ async def aiosseclient(
     session: Optional[ClientSession] = None,
     method: Literal['get', 'post', 'put', 'delete', 'patch', 'options', 'head'] = 'get',
     json: Optional[dict] = None,
-    extra_headers: Optional[dict[str, str]] = None,
+    headers: Optional[dict[str, str]] = None,
     last_id: Optional[str] = None,
     valid_http_codes: Sequence[int] = DEFAULT_VALID_HTTP_CODES,
     exit_events: Optional[List[str]] = None,
@@ -45,33 +45,34 @@ async def aiosseclient(
         - last_id: the last event id
         - valid_http_codes: the valid http codes, default (200, 301, 307)
         - exit_events: the events that will cause the session to close
-        - extra_headers: the extra headers to be added to the request
+        - headers: the extra headers to be added to the request
         - events: Callables for triggering events. {event_name: no-arg-callable}. Callable can be async or non-async.
         - kwargs: other arguments to be passed to the aiohttp.ClientSession.request method
         
     Example:
     ```python
-    async with aiohttp.ClientSession() as session:
-        async for event in aiosseclient(url=some_url, session, method='post', json=some_data):
-            print(data, end='', flush=True)
+    async for event in aiosseclient(url=some_url, method='post', json=some_data):
+        print(data, end='', flush=True)
     ```
     '''
+    if session is None:
+        session = aiohttp.ClientSession()
     if not isinstance(session, ClientSession):
         raise ValueError('session must be an aiohttp.ClientSession object')
-    if not method.lower() not in ('get', 'post', 'put', 'delete', 'patch', 'options', 'head'):
-        raise ValueError('url must be a string')
+    if not method.lower() in ('get', 'post', 'put', 'delete', 'patch', 'options', 'head'):
+        raise ValueError('method must be one of: get, post, put, delete, patch, options, head. Got: "{}"'.format(method))
     method = method.lower() # type: ignore
     
     # The SSE spec requires making requests with Cache-Control: nocache
-    extra_headers = extra_headers or {}
-    extra_headers.update(
+    headers = headers or {}
+    headers.update(
             {
                 'Cache-Control' : 'no-cache',
                 'Accept': 'text/event-stream',
             }
         )
     if last_id:
-        extra_headers['Last-Event-ID'] = last_id
+        headers['Last-Event-ID'] = last_id
 
     # Override default timeout of 5 minutes
     session = session or aiohttp.ClientSession()
@@ -79,7 +80,7 @@ async def aiosseclient(
     async with session:
         try:
             sse_method = getattr(session, method)
-            response = await sse_method(url, headers=extra_headers, json=json, **kwargs)
+            response = await sse_method(url, headers=headers, json=json, **kwargs)
             if response.status not in valid_http_codes:
                 _LOGGER.error('Invalid HTTP response.status: %s', response.status)
                 await session.close()
@@ -87,8 +88,8 @@ async def aiosseclient(
             response_lines = []
             async for line in response.content:
                 line = line.decode('utf-8')
-
-                if line in SSESep:  # if line is a separator, means the end of an event
+                
+                if line in SSESep.__members__.values():  # if line is a separator, means the end of an event
                     if response_lines[0] == ':ok\n':
                         response_lines = []
                         continue

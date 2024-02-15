@@ -1,3 +1,15 @@
+Metadata-Version: 2.1
+Name: aiossechat
+Version: 0.0.2
+Summary: A small example package
+Home-page: https://github.com/92MING/aiossechat
+Author: 92MING
+Author-email: yashin.sd123@yahoo.com.hk
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+
 # aio-sse-chat
 
 Special python aio sse client module especially for parsing server-sent events (SSE) response from LLM. 

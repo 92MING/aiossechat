@@ -17,9 +17,8 @@ async def sse_endpoint(data: dict):
 ##################
 # client side
 
-async with aiohttp.ClientSession() as session:
-    async for event in aiosseclient(url=some_url, session, method='post', json=some_data):
-        print(data, end='', flush=True)   # can get single `'\n'` correctly
+async for event in aiosseclient(url=some_url, method='post', json=some_data):
+    print(data, end='', flush=True)   # can get single `'\n'` correctly
 
 ```
     
