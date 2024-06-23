@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name="aiossechat",
-  version="0.0.2",
+  version="0.0.3",
   author="92MING",
   author_email="yashin.sd123@yahoo.com.hk",
-  description="A small example package",
+  description="A simple sse implementation with aiohttp, which is specifically designed for chatting with LLM.",
   long_description=long_description,
   long_description_content_type="text/markdown",
   url="https://github.com/92MING/aiossechat",
