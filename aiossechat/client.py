@@ -82,8 +82,8 @@ async def aiosseclient(
             sse_method = getattr(session, method)
             response = await sse_method(url, headers=headers, json=json, **kwargs)
             if response.status not in valid_http_codes:
-                _LOGGER.error('Invalid HTTP response.status: %s', response.status)
                 await session.close()
+                raise ValueError('Invalid HTTP response code: {}'.format(response.status))
                 
             response_lines = []
             async for line in response.content:
