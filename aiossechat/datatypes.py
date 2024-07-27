@@ -5,7 +5,14 @@ Edit from pypi module `aiosseclient`
 
 import re, logging
 from enum import Enum
-from typing import List, Optional, Final, Union, Self, Literal
+
+import sys
+if sys.version_info >= (3, 11):
+    from typing import List, Optional, Final, Union, Self, Literal
+else:
+    from typing import List, Optional, Final, Union, Literal
+    from typing_extensions import Self
+
 from dataclasses import dataclass
 
 _SSE_LINE_PATTERN: Final[re.Pattern] = re.compile('(?P<name>[^:]*):?( ?(?P<value>.*))?')
