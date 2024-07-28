@@ -1,3 +1,6 @@
-.vscode
-dist
-build
+/.vscode
+/dist
+/build
+/aiossechat.egg-info
+
+setup.py
