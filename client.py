@@ -1,5 +1,8 @@
 
-import logging, aiohttp, asyncio
+import logging
+import aiohttp
+import asyncio
+
 from aiohttp import ClientSession
 from typing import List, Optional, AsyncGenerator, Final, Sequence, Tuple, Union, Callable, Awaitable, Any, Dict, Literal
 
@@ -83,7 +86,7 @@ async def aiosseclient(
             response = await sse_method(url, headers=headers, json=json, **kwargs)
             if response.status not in valid_http_codes:
                 await session.close()
-                raise ValueError('Invalid HTTP response code: {}'.format(response.status))
+                raise AioSSEChatInvalidResponseCodeError(response.status)
                 
             response_lines = []
             async for line in response.content:
@@ -108,11 +111,9 @@ async def aiosseclient(
                 else:
                     response_lines.append(line)
                 
-        except TimeoutError as e:
+        except (TimeoutError, asyncio.TimeoutError) as e:
             _LOGGER.error('TimeoutError: %s', e)
-        finally:
-            if not session.closed:
-                await session.close()
+
 
 
 __all__ = ['aiosseclient']

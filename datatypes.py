@@ -3,10 +3,12 @@ aio sse client
 Edit from pypi module `aiosseclient`
 '''
 
-import re, logging
+import re
+import sys
+import logging
+
 from enum import Enum
 
-import sys
 if sys.version_info >= (3, 11):
     from typing import List, Optional, Final, Union, Self, Literal
 else:
@@ -117,7 +119,7 @@ class SSEvent:
             elif sse_type == DefaultSSEType.ID:
                 event.id = value
             elif sse_type == DefaultSSEType.RETRY:
-                event.retry = int(value)
+                event.retry = int(value)    # type: ignore
 
         return event
 
@@ -138,3 +140,15 @@ class SSEvent:
 
 __all__ = ['SSEvent', 'SSEventContent', 'DefaultSSEType', 'SSESep']
 
+class AioSSEChatError(Exception):
+    '''Base class for all aio-sse-chat exceptions.'''
+    pass
+
+class AioSSEChatInvalidResponseCodeError(AioSSEChatError):
+    '''Raised when the server returns an invalid HTTP response code.'''
+    def __init__(self, code: int):
+        super().__init__(f'Invalid HTTP response code: {code}')
+        self.code = code
+        
+        
+__all__.extend(['AioSSEChatError', 'AioSSEChatInvalidResponseCodeError'])
